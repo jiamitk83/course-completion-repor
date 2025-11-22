@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapter Management - Course Completion Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+        }
+        nav {
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #007bff;
+        }
+        .filters {
+            margin-bottom: 20px;
+        }
+        select, input, button {
+            padding: 8px;
+            margin-right: 10px;
+        }
+        #add-chapter {
+            margin-bottom: 20px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #f4f4f4;
+            margin-bottom: 10px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .chapter-info {
+            flex-grow: 1;
+        }
+        .edit-input {
+            margin-right: 10px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+            <div class="container">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+                    <a class="nav-link" href="subject-management.html"><i class="fas fa-book"></i> Subject Management</a>
+                    <a class="nav-link" href="class-management.html"><i class="fas fa-users"></i> Class Management</a>
+                    <a class="nav-link active" href="chapter-management.html"><i class="fas fa-file-alt"></i> Chapter Management</a>
+                    <a class="nav-link" href="current-status.html"><i class="fas fa-tasks"></i> Current Status</a>
+                </div>
+            </div>
+        </nav>
+        <h1 class="text-center mb-4"><i class="fas fa-file-alt"></i> Chapter Management</h1>
+    <div class="card mb-4">
+        <div class="card-header bg-info text-white">
+            <h5 class="mb-0"><i class="fas fa-filter"></i> Filters</h5>
+        </div>
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="class-select" class="form-label"><i class="fas fa-users"></i> Class</label>
+                    <select class="form-select" id="class-select" aria-label="Select Class">
+                        <option value="">Select Class</option>
+                    </select>
+                </div>
+                <div class="col-md-6">
+                    <label for="subject-select" class="form-label"><i class="fas fa-book"></i> Subject</label>
+                    <select class="form-select" id="subject-select" disabled aria-label="Select Subject">
+                        <option value="">Select Subject</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="add-chapter" style="display: none;">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-plus-circle"></i> Add New Chapter</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="chapter-number" class="form-label"><i class="fas fa-hashtag"></i> Chapter Number</label>
+                        <input type="number" class="form-control" id="chapter-number" placeholder="e.g. 1">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="chapter-name" class="form-label"><i class="fas fa-file-alt"></i> Chapter Name</label>
+                        <input type="text" class="form-control" id="chapter-name" placeholder="e.g. Introduction">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="start-month" class="form-label"><i class="fas fa-calendar-alt"></i> Start Month</label>
+                        <select class="form-select" id="start-month">
+                            <option value="">Select</option>
+                            <option value="1">Jan</option>
+                            <option value="2">Feb</option>
+                            <option value="3">Mar</option>
+                            <option value="4">Apr</option>
+                            <option value="5">May</option>
+                            <option value="6">Jun</option>
+                            <option value="7">Jul</option>
+                            <option value="8">Aug</option>
+                            <option value="9">Sep</option>
+                            <option value="10">Oct</option>
+                            <option value="11">Nov</option>
+                            <option value="12">Dec</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="end-month" class="form-label"><i class="fas fa-calendar-check"></i> End Month</label>
+                        <select class="form-select" id="end-month">
+                            <option value="">Select</option>
+                            <option value="1">Jan</option>
+                            <option value="2">Feb</option>
+                            <option value="3">Mar</option>
+                            <option value="4">Apr</option>
+                            <option value="5">May</option>
+                            <option value="6">Jun</option>
+                            <option value="7">Jul</option>
+                            <option value="8">Aug</option>
+                            <option value="9">Sep</option>
+                            <option value="10">Oct</option>
+                            <option value="11">Nov</option>
+                            <option value="12">Dec</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button class="btn btn-success w-100" id="add-btn"><i class="fas fa-plus"></i> Add Chapter</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">
+            <h5 class="mb-0"><i class="fas fa-list"></i> Chapters</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="chapter-table">
+                    <thead class="table-dark">
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> Chapter No.</th>
+                            <th><i class="fas fa-file-alt"></i> Chapter Name</th>
+                            <th><i class="fas fa-calendar-alt"></i> Starting Month</th>
+                            <th><i class="fas fa-calendar-check"></i> Ending Month</th>
+                            <th><i class="fas fa-cogs"></i> Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="chapter-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const classSelect = document.getElementById('class-select');
+        const subjectSelect = document.getElementById('subject-select');
+        const chapterNumberInput = document.getElementById('chapter-number');
+        const chapterNameInput = document.getElementById('chapter-name');
+        const startMonthSelect = document.getElementById('start-month');
+        const endMonthSelect = document.getElementById('end-month');
+        const addBtn = document.getElementById('add-btn');
+        const addChapterDiv = document.getElementById('add-chapter');
+        const chapterTable = document.getElementById('chapter-table');
+
+        // Load data
+        let classes = [];
+        let subjects = [];
+        let chapters = {};
+
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        async function populateClasses() {
+            try {
+                const response = await fetch('/api/classes');
+                classes = await response.json();
+                classSelect.innerHTML = '<option value="">Select Class</option>';
+                classes.forEach(cls => {
+                    const option = document.createElement('option');
+                    option.value = cls;
+                    option.textContent = cls;
+                    classSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading classes:', error);
+            }
+        }
+
+        async function populateSubjects() {
+            try {
+                const response = await fetch('/api/subjects');
+                subjects = await response.json();
+                subjectSelect.innerHTML = '<option value="">Select Subject</option>';
+                subjects.forEach(sub => {
+                    const option = document.createElement('option');
+                    option.value = sub;
+                    option.textContent = sub;
+                    subjectSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
+        }
+
+        function monthOptions(selected) {
+            let options = '<option value="">Select</option>';
+            for (let i = 1; i <= 12; i++) {
+                options += `<option value="${i}" ${i == selected ? 'selected' : ''}>${monthNames[i-1]}</option>`;
+            }
+            return options;
+        }
+
+        async function renderChapters() {
+            const selectedClass = classSelect.value;
+            const selectedSubject = subjectSelect.value;
+            const tbody = document.getElementById('chapter-tbody');
+            tbody.innerHTML = '';
+            if (selectedClass && selectedSubject) {
+                try {
+                    const response = await fetch(`/api/chapters/${selectedClass}/${selectedSubject}`);
+                    const chapterList = await response.json();
+                    chapterList.forEach((chapter) => {
+                        const tr = document.createElement('tr');
+                        tr.setAttribute('data-chapter', JSON.stringify(chapter));
+                        tr.innerHTML = `
+                            <td>${chapter.chapterNumber}</td>
+                            <td>${chapter.name}</td>
+                            <td>${monthNames[chapter.startMonth - 1]}</td>
+                            <td>${monthNames[chapter.endMonth - 1]}</td>
+                            <td>
+                                <button class="btn btn-sm btn-outline-primary me-2 edit-btn" data-id="${chapter._id}"><i class="fas fa-edit"></i> Edit</button>
+                                <button class="btn btn-sm btn-outline-danger delete-btn" data-id="${chapter._id}"><i class="fas fa-trash"></i> Delete</button>
+                            </td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                } catch (error) {
+                    console.error('Error loading chapters:', error);
+                }
+            }
+        }
+
+        function saveChapters() {
+            localStorage.setItem('chapters', JSON.stringify(chapters));
+        }
+
+        classSelect.addEventListener('change', () => {
+            subjectSelect.disabled = !classSelect.value;
+            if (!classSelect.value) {
+                subjectSelect.value = '';
+                addChapterDiv.style.display = 'none';
+            }
+            renderChapters();
+        });
+
+        subjectSelect.addEventListener('change', () => {
+            addChapterDiv.style.display = subjectSelect.value ? 'block' : 'none';
+            renderChapters();
+        });
+
+        addBtn.addEventListener('click', async () => {
+            const number = parseInt(chapterNumberInput.value);
+            const name = chapterNameInput.value.trim();
+            const start = parseInt(startMonthSelect.value);
+            const end = parseInt(endMonthSelect.value);
+            const selectedClass = classSelect.value;
+            const selectedSubject = subjectSelect.value;
+            if (number && name && start && end && start <= end && selectedClass && selectedSubject) {
+                try {
+                    await fetch('/api/chapters', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ chapterNumber: number, name, startMonth: start, endMonth: end, className: selectedClass, subjectName: selectedSubject })
+                    });
+                    chapterNumberInput.value = '';
+                    chapterNameInput.value = '';
+                    startMonthSelect.value = '';
+                    endMonthSelect.value = '';
+                    renderChapters();
+                } catch (error) {
+                    console.error('Error adding chapter:', error);
+                }
+            }
+        });
+
+        chapterTable.addEventListener('click', async (e) => {
+            const id = e.target.dataset.id;
+            const selectedClass = classSelect.value;
+            const selectedSubject = subjectSelect.value;
+            if (e.target.classList.contains('edit-btn')) {
+                const tr = e.target.closest('tr');
+                const chapter = JSON.parse(tr.getAttribute('data-chapter'));
+                const tds = tr.querySelectorAll('td');
+                tds[0].innerHTML = `<input type="number" class="form-control form-control-sm edit-input" value="${chapter.chapterNumber}">`;
+                tds[1].innerHTML = `<input type="text" class="form-control form-control-sm edit-input" value="${chapter.name}">`;
+                tds[2].innerHTML = `<select class="form-select form-select-sm edit-input">${monthOptions(chapter.startMonth)}</select>`;
+                tds[3].innerHTML = `<select class="form-select form-select-sm edit-input">${monthOptions(chapter.endMonth)}</select>`;
+                e.target.innerHTML = '<i class="fas fa-save"></i> Save';
+                e.target.classList.remove('btn-outline-primary');
+                e.target.classList.add('btn-success');
+                e.target.classList.remove('me-2');
+                e.target.classList.remove('edit-btn');
+                e.target.classList.add('save-btn');
+            } else if (e.target.classList.contains('save-btn')) {
+                const tr = e.target.closest('tr');
+                const inputs = tr.querySelectorAll('.edit-input');
+                const newNumber = parseInt(inputs[0].value);
+                const newName = inputs[1].value.trim();
+                const newStart = parseInt(inputs[2].value);
+                const newEnd = parseInt(inputs[3].value);
+                if (newNumber && newName && newStart && newEnd && newStart <= newEnd) {
+                    try {
+                        await fetch(`/api/chapters/${id}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ chapterNumber: newNumber, name: newName, startMonth: newStart, endMonth: newEnd, className: selectedClass, subjectName: selectedSubject })
+                        });
+                        renderChapters();
+                    } catch (error) {
+                        console.error('Error updating chapter:', error);
+                    }
+                }
+            } else if (e.target.classList.contains('delete-btn')) {
+                try {
+                    await fetch(`/api/chapters/${id}`, {
+                        method: 'DELETE'
+                    });
+                    renderChapters();
+                } catch (error) {
+                    console.error('Error deleting chapter:', error);
+                }
+            }
+        });
+
+        // Initialize
+        populateClasses();
+        populateSubjects();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+</body>
+</html>

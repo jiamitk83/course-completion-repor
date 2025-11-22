@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Course Completion Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+        }
+        nav {
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #007bff;
+        }
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .stat {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            flex: 1;
+            margin: 0 10px;
+        }
+        .stat h3 {
+            margin: 0;
+            font-size: 2em;
+        }
+        .stat p {
+            margin: 5px 0 0 0;
+        }
+        .report {
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid">
+        <h1 class="text-center my-4"><i class="fas fa-chart-line"></i> Course Completion Report Dashboard</h1>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+        <div class="container">
+            <div class="navbar-nav">
+                <a class="nav-link active" href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+                <a class="nav-link" href="subject-management.html"><i class="fas fa-book"></i> Subject Management</a>
+                <a class="nav-link" href="class-management.html"><i class="fas fa-users"></i> Class Management</a>
+                <a class="nav-link" href="chapter-management.html"><i class="fas fa-file-alt"></i> Chapter Management</a>
+                <a class="nav-link" href="current-status.html"><i class="fas fa-tasks"></i> Current Status</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-white bg-success mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-users"></i> Total Classes</h5>
+                    <h2 id="total-classes">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-info mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-book"></i> Total Subjects</h5>
+                    <h2 id="total-subjects">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-warning mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-file-alt"></i> Total Chapters</h5>
+                    <h2 id="total-chapters">0</h2>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title"><i class="fas fa-percentage"></i> Completion Rate</h5>
+                    <h2 id="completion-rate">0%</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="mb-0"><i class="fas fa-table"></i> Status Report</h2>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover" id="report-table">
+                    <thead class="table-dark">
+                        <tr>
+                            <th><i class="fas fa-users"></i> Class</th>
+                            <th><i class="fas fa-book"></i> Subject</th>
+                            <th><i class="fas fa-file-alt"></i> Total Chapters</th>
+                            <th><i class="fas fa-check"></i> Completed Chapters</th>
+                            <th><i class="fas fa-percentage"></i> Completion %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="report-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function calculateStats() {
+            try {
+                const [classesResponse, subjectsResponse, allChaptersResponse, allStatusResponse] = await Promise.all([
+                    fetch('/api/classes'),
+                    fetch('/api/subjects'),
+                    fetch('/api/all-chapters'),
+                    fetch('/api/all-status')
+                ]);
+                const classes = await classesResponse.json();
+                const subjects = await subjectsResponse.json();
+                const allChapters = await allChaptersResponse.json();
+                const allStatus = await allStatusResponse.json();
+
+                document.getElementById('total-classes').textContent = classes.length;
+                document.getElementById('total-subjects').textContent = subjects.length;
+                document.getElementById('total-chapters').textContent = allChapters.length;
+
+                let totalCompleted = 0;
+                const statusMap = {};
+                allStatus.forEach(s => {
+                    const key = `${s.className}-${s.subjectName}-${s.chapterNumber}`;
+                    statusMap[key] = s;
+                    if (s.chapterCompleted) totalCompleted++;
+                });
+
+                const overallRate = allChapters.length > 0 ? Math.round((totalCompleted / allChapters.length) * 100) : 0;
+                document.getElementById('completion-rate').textContent = overallRate + '%';
+
+                const tbody = document.getElementById('report-tbody');
+                tbody.innerHTML = '';
+
+                const grouped = {};
+                allChapters.forEach(chap => {
+                    const key = `${chap.className}-${chap.subjectName}`;
+                    if (!grouped[key]) grouped[key] = { className: chap.className, subjectName: chap.subjectName, chapters: [] };
+                    grouped[key].chapters.push(chap);
+                });
+
+                Object.values(grouped).forEach(group => {
+                    const chapList = group.chapters;
+                    let completed = 0;
+                    chapList.forEach(chap => {
+                        const key = `${group.className}-${group.subjectName}-${chap.chapterNumber}`;
+                        if (statusMap[key] && statusMap[key].chapterCompleted) completed++;
+                    });
+                    const percentage = chapList.length > 0 ? Math.round((completed / chapList.length) * 100) : 0;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${group.className}</td>
+                        <td>${group.subjectName}</td>
+                        <td>${chapList.length}</td>
+                        <td>${completed}</td>
+                        <td>${percentage}%</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            } catch (error) {
+                console.error('Error loading stats:', error);
+            }
+        }
+
+        // Initialize
+        calculateStats();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    </div>
+</body>
+</html>

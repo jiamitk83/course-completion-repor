@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Management - Course Completion Report</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+        }
+        nav {
+            background-color: #f2f2f2;
+            padding: 10px;
+            margin-bottom: 20px;
+        }
+        nav a {
+            margin-right: 20px;
+            text-decoration: none;
+            color: #333;
+            font-weight: bold;
+        }
+        nav a:hover {
+            color: #007bff;
+        }
+        #add-subject {
+            margin-bottom: 20px;
+        }
+        #subject-name {
+            padding: 8px;
+            width: 70%;
+            margin-right: 10px;
+        }
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            background: #f4f4f4;
+            margin-bottom: 10px;
+            padding: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .edit-input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary mb-4">
+            <div class="container">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="index.html"><i class="fas fa-home"></i> Dashboard</a>
+                    <a class="nav-link active" href="subject-management.html"><i class="fas fa-book"></i> Subject Management</a>
+                    <a class="nav-link" href="class-management.html"><i class="fas fa-users"></i> Class Management</a>
+                    <a class="nav-link" href="chapter-management.html"><i class="fas fa-file-alt"></i> Chapter Management</a>
+                    <a class="nav-link" href="current-status.html"><i class="fas fa-tasks"></i> Current Status</a>
+                </div>
+            </div>
+        </nav>
+        <h1 class="text-center mb-4"><i class="fas fa-book"></i> Subject Management</h1>
+        <div class="card mb-4">
+            <div class="card-body">
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="subject-name" placeholder="Enter subject name">
+                    <button class="btn btn-primary" id="add-btn"><i class="fas fa-plus"></i> Add Subject</button>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list"></i> Subjects</h5>
+            </div>
+            <div class="card-body">
+                <ul class="list-group" id="subject-list"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const subjectList = document.getElementById('subject-list');
+        const subjectNameInput = document.getElementById('subject-name');
+        const addBtn = document.getElementById('add-btn');
+
+        let subjects = [];
+
+        async function loadSubjects() {
+            try {
+                const response = await fetch('/api/subjects');
+                subjects = await response.json();
+                renderSubjects();
+            } catch (error) {
+                console.error('Error loading subjects:', error);
+            }
+        }
+
+        function renderSubjects() {
+            subjectList.innerHTML = '';
+            subjects.forEach((subject, index) => {
+                const li = document.createElement('li');
+                li.className = 'list-group-item d-flex justify-content-between align-items-center';
+                li.innerHTML = `
+                    <span>${subject}</span>
+                    <div>
+                        <button class="btn btn-sm btn-outline-primary me-2 edit-btn" data-index="${index}"><i class="fas fa-edit"></i> Edit</button>
+                        <button class="btn btn-sm btn-outline-danger delete-btn" data-index="${index}"><i class="fas fa-trash"></i> Delete</button>
+                    </div>
+                `;
+                subjectList.appendChild(li);
+            });
+        }
+
+        // Add subject
+        addBtn.addEventListener('click', async () => {
+            const name = subjectNameInput.value.trim();
+            if (name) {
+                try {
+                    await fetch('/api/subjects', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ name })
+                    });
+                    subjectNameInput.value = '';
+                    loadSubjects();
+                } catch (error) {
+                    console.error('Error adding subject:', error);
+                }
+            }
+        });
+
+        // Edit and Delete
+        subjectList.addEventListener('click', async (e) => {
+            const index = e.target.dataset.index;
+            const subjectName = subjects[index];
+            if (e.target.classList.contains('edit-btn')) {
+                const li = e.target.closest('li');
+                const span = li.querySelector('span');
+                const currentName = span.textContent;
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.value = currentName;
+                input.className = 'form-control edit-input';
+                li.replaceChild(input, span);
+                e.target.innerHTML = '<i class="fas fa-save"></i> Save';
+                e.target.classList.remove('edit-btn');
+                e.target.classList.add('save-btn');
+                e.target.classList.remove('btn-outline-primary');
+                e.target.classList.add('btn-success');
+            } else if (e.target.classList.contains('save-btn')) {
+                const li = e.target.closest('li');
+                const input = li.querySelector('.edit-input');
+                const newName = input.value.trim();
+                if (newName) {
+                    try {
+                        await fetch(`/api/subjects/${subjectName}`, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ name: newName })
+                        });
+                        loadSubjects();
+                    } catch (error) {
+                        console.error('Error updating subject:', error);
+                    }
+                }
+            } else if (e.target.classList.contains('delete-btn')) {
+                try {
+                    await fetch(`/api/subjects/${subjectName}`, {
+                        method: 'DELETE'
+                    });
+                    loadSubjects();
+                } catch (error) {
+                    console.error('Error deleting subject:', error);
+                }
+            }
+        });
+
+        // Initial load
+        loadSubjects();
+    </script>
+</body>
+</html>
